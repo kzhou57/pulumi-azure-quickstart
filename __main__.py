@@ -1,11 +1,12 @@
 """An Azure Python Pulumi program"""
 
 import pulumi
+from pulumi import ResourceOptions
 from pulumi_azure import core, storage
 from pulumi_azure.core import ResourceGroup
 from pulumi_azure.storage import Account
 from pulumi_azuread import Application, ServicePrincipal, ServicePrincipalPassword
-from pulumi_azure.role import Assignment
+from pulumi_azure.authorization import Assignment
 from pulumi_azure.containerservice import KubernetesCluster, Registry
 from pulumi_azure.network import VirtualNetwork, Subnet
 from pulumi_kubernetes import Provider
@@ -55,7 +56,7 @@ subnet = Subnet(
     'subnet',
     name='kzhou-subnet',
     resource_group_name=rg.name,
-    address_prefix='10.0.0.0/24',
+    address_prefixes=['10.0.0.0/24'],
     virtual_network_name=vnet.name
 )
 
@@ -70,9 +71,9 @@ acr = Registry(
 
 acr_assignment = Assignment(
     'acr-permissions',
-    principal_id=sp.id,
+    scope=acr.id,
     role_definition_name='AcrPull',
-    scope=acr.id
+    principal_id=sp.id
 )
 
 subnet_assignment = Assignment(
@@ -87,15 +88,14 @@ aks = KubernetesCluster(
     name='kzhou-aks',
     location=rg.location,
     resource_group_name=rg.name,
-    kubernetes_version="1.13.5",
+    kubernetes_version="1.19.3",
     dns_prefix="dns",
-    agent_pool_profile=(
+    default_node_pool=(
         {
             "name": "type1",
-            "count": 2,
-            "vmSize": "Standard_B2ms",
-            "osType": "Linux",
-            "maxPods": 110,
+            "node_count": 2,
+            "vm_size": "Standard_B2ms",
+            "max_pods": 110,
             "vnet_subnet_id": subnet.id
         }
     ),
