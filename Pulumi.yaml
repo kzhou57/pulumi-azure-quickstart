@@ -1,0 +1,13 @@
+name: pulumi-azure-quickstart
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: Create an Azure Kubernetes Service (AKS) cluster and deploy a C# Rest API into it
+template:
+  config:
+    password:
+      description: Cluster password
+      secret: true
+    sshPublicKey:
+      description: SSH public key (generate with `ssh-keygen -t rsa -f key.rsa`)

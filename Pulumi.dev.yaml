@@ -1,0 +1,6 @@
+config:
+  azure:location: westus
+  pulumi-azure-quickstart:password:
+    secure: AAABAF9a+hVSXkMcbtws8KONwNKwtLnM5bkilCbM67vavsaVTnjS+w==
+  pulumi-azure-quickstart:sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDKiSALQQwLEOfJoUrsvzZJn16ct4ElruyD4vtYmGJ4YiN3Xi+gPmQxw70Psat1eIMdvzXRbzDbYUZzvaoKDw42UNvNwffpnnpgTI0ScsUsEcrHaFORi/H4pn7++x7A42r1MqxpzX0Yxv8iIu0nI+DS6XJDfmoErCXYZj1H/oYFFW9EmQ2vNzXym9xklShgwxyuP+rhj5VTlh3jwb62GnmlwYcMMEo90Qw8a3/F64lL1SkTCFA998VHtNk9E8t1M/C68Mf8+IwJkdZAWEaAI9WCFcO3d+Y90l9/oVJRC34n4s5vti4aWfUt3FqXSnl/4LKQJj5V0eJEY+E8ERpPss4Fpr0pjNCN8glQF8ULhedbb7NZochhhyaI7GYP3RiDzO5/iPXc8553Ajp2eQBykRmW8D6icM0GTBvR/ZIzYLWLJaSTUbOoBYHYOx3lVW2mB3K9jgnx9lI6ihyRGkfawXVGp+ufaNmsdQ/Rf1U9NNFWm5KGErJb0vtENGKPskTEqec=
+    kzhou@kevin-e7470
