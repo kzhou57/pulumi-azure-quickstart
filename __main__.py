@@ -128,6 +128,70 @@ custom_provider = Provider(
     "inflation_provider", kubeconfig=aks.kube_config_raw
 )
 
-# Export the connection string for the storage account
+name = 'replaceme'
+
+# Create a Kubernetes Namespace
+namespace = Namespace(name,
+    metadata={},
+    __opts__=ResourceOptions(provider=custom_provider)
+)
+
+# Create a NGINX Deployment
+appLabels = { "appClass": name }
+deployment = Deployment(name,
+            metadata={
+                "labels": appLabels
+            },
+            spec={
+                "selector": {
+                    "match_labels": appLabels
+                },
+                "replicas": 1,
+                "template": {
+                    "metadata": {
+                        "labels": appLabels
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": name,
+                                "image": "nginx",
+                                "ports": [
+                                    {
+                                        "name": "http",
+                                        "containerPort": 80
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            __opts__=ResourceOptions(provider=custom_provider)
+            )
+
+# Create nginx service
+service = Service(name,
+    metadata={
+        "labels": appLabels
+    },
+    spec={
+        "ports": [
+            {
+                "name": "http",
+                "port": 80
+            }
+        ],
+        "selector": appLabels,
+        "type": "LoadBalancer",
+    },
+    __opts__=ResourceOptions(provider=custom_provider)
+)
+
+# Export
 pulumi.export('storage_connection_string', account.primary_connection_string)
 pulumi.export('kubeconfig', aks.kube_config_raw)
+pulumi.export('namespace_name', namespace.metadata.apply(lambda resource: resource['name']))
+pulumi.export('deployment_name', deployment.metadata.apply(lambda resource: resource['name']))
+pulumi.export('service_name', service.metadata.apply(lambda resource: resource['name']))
+pulumi.export('service_public_endpoint', service.status.apply(lambda status: status['load_balancer']['ingress'][0]['ip']))
