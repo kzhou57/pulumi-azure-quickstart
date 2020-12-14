@@ -11,3 +11,6 @@ template:
       secret: true
     sshPublicKey:
       description: SSH public key (generate with `ssh-keygen -t rsa -f key.rsa`)
+    sa_password:
+      description: SQL server password for sysadmin
+      secret: true

@@ -2,7 +2,7 @@
 
 import pulumi
 from pulumi import ResourceOptions
-from pulumi_azure import core, storage
+from pulumi_azure import core, storage, mssql
 from pulumi_azure.core import ResourceGroup
 from pulumi_azure.storage import Account
 from pulumi_azuread import Application, ServicePrincipal, ServicePrincipalPassword
@@ -17,6 +17,7 @@ config = pulumi.Config()
 PASSWORD = config.require('password')
 SSHKEY = config.require('sshPublicKey')
 LOCATION = config.get('location') or 'east us'
+SA_PASSWORD = config.require('sa_password')
 
 app = Application(
     'kzhou-app',
@@ -125,10 +126,20 @@ aks = KubernetesCluster(
 )
 
 custom_provider = Provider(
-    "inflation_provider", kubeconfig=aks.kube_config_raw
+    "k8s", kubeconfig=aks.kube_config_raw
 )
 
-name = 'replaceme'
+sql = mssql.Server("kzhou-sql",
+    resource_group_name=rg.name,
+    location=rg.location,
+    version="12.0",
+    administrator_login="sysadmin",
+    administrator_login_password=SA_PASSWORD,
+    minimum_tls_version="1.2",
+    public_network_access_enabled=True
+    )
+
+name = 'kzhou'
 
 # Create a Kubernetes Namespace
 namespace = Namespace(name,
@@ -190,8 +201,10 @@ service = Service(name,
 
 # Export
 pulumi.export('storage_connection_string', account.primary_connection_string)
+pulumi.export('resource_group_id', rg.id)
 pulumi.export('kubeconfig', aks.kube_config_raw)
 pulumi.export('namespace_name', namespace.metadata.apply(lambda resource: resource['name']))
 pulumi.export('deployment_name', deployment.metadata.apply(lambda resource: resource['name']))
 pulumi.export('service_name', service.metadata.apply(lambda resource: resource['name']))
 pulumi.export('service_public_endpoint', service.status.apply(lambda status: status['load_balancer']['ingress'][0]['ip']))
+pulumi.export('sql_domain_name', sql.fully_qualified_domain_name)
